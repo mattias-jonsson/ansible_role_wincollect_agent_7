@@ -1,0 +1,35 @@
+<Service version="{{ wincollect_agent_version }}" classification="Service" type="Service" module="WinCollectPlugin" name="DestinationManager">
+	<Environment/>
+	<InstanceData>
+		<Instance name="{{ wincollect_destinationmanager_instance_name }}">
+			<Environment/>
+			<Module order="1" service_name="StoreAndForwardStage">
+				<Environment>
+					<Parameter name="DataChunkPeriod" value="10"/>
+					<Parameter name="DataProcessingPeriod" value="500000"/>
+					<Parameter name="QueueLowWaterMark" value="750000"/>
+					<Parameter name="QueueHighWaterMark" value="1000000"/>
+					<Parameter name="Schedule.Enable" value="true"/>
+					<Parameter name="Schedule.Invert" value="false"/>
+					<Parameter name="Socket.KeepAlive.Enabled" value="true"/>
+					<Parameter name="Socket.KeepAlive.Time" value="30000"/>
+					<Parameter name="Socket.KeepAlive.Interval" value="4000"/>
+				</Environment>
+			</Module>
+			<Module order="2" service_name="SimpleEventThrottle">
+				<Environment>
+					<Parameter name="EventThrottleInEPS" value="5000"/>
+				</Environment>
+			</Module>
+			<Module order="3" service_name="SyslogHeaderStage">
+				<Environment/>
+			</Module>
+			<Module order="4" service_name="{{ 'UDPSendStage' if wincollect_target_protocol | lower == 'udp' else 'TCPSendstage' if wincollect_target_protocol | lower == 'tcp' }}">
+				<Environment>
+					<Parameter name="TargetAddress" value="{{ wincollect_target_address }}"/>
+					<Parameter name="TargetPort" value="{{ wincollect_target_port }}"/>
+				</Environment>
+			</Module>
+		</Instance>
+	</InstanceData>
+</Service>

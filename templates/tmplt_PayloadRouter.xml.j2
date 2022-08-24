@@ -1,0 +1,9 @@
+<Service classification="Service" type="Service" version="{{ wincollect_agent_version }}" module="Routing" name="PayloadRouter">
+	<Environment>
+		<Parameter name="RouterThreads" value="3" />
+		<Parameter name="QueueLowWaterMark" value="9975000" />
+		<Parameter name="QueueHighWaterMark" value="10000000" />
+		<Parameter name="StatisticsSweepPeriod" value="30" />
+		<Parameter name="AddRoute" value="{{ '{' }}{{ wincollect_devicewindowslog_instance_name }}{{ '}' }}{{ '{' }}{{ wincollect_destinationmanager_instance_name }}{{ '}' }}" />
+	</Environment>
+</Service>

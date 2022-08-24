@@ -1,0 +1,9 @@
+	<Service classification="Static" type="Service" version="{{ wincollect_agent_version }}" module="AgentCore" name="AgentCore">
+		<Environment>
+			<Parameter name="LogMonitor.Socket.Type" value="UDP"/>
+			<Parameter name="HeartbeatInterval" value="300000"/>
+			<Parameter name="ConfigurationCheckInterval" value="300000"/>
+			<Parameter name="Enabled" value="true"/>
+			<Parameter name="Deleted" value="false"/>
+		</Environment>
+	</Service>

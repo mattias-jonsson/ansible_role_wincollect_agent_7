@@ -1,0 +1,21 @@
+---
+
+wincollect_devicewindowslog_instance_name: "{{ ansible_hostname }}"
+wincollect_device_address: "{{ ansible_hostname }}"
+wincollect_remote_machine: "{{ ansible_hostname }}"
+wincollect_destinationmanager_instance_name: "qradar_{{ wincollect_target_address }}"
+wincollect_product_id: '{1E933549-2407-4A06-8EC5-83313513AE4B}'
+wincollect_agent_filter_security_nsa_events: [1100,1102,4624,4625,4634,4648,4657,4672,4688,4689,4704,4706,4713,4714,4716,4719,4720,4722,4725,4726,4728,4731,4732,4733,4735,4740,4756,4765,4766,4767,4769,4776,4778,4779,4781,4782,4793,4870,4873,4874,4880,4881,4882,4885,4886,4887,4888,4890,4891,4892,4896,4897,4898,4899,4900,5038,5136,5137,5138,5139,5140,5141,5142,5144,5145,5376,5377,5632,6272,6273,6274,6275,6276,6277,6278,6279,6280,6281]
+wincollect_agent_filter_system_nsa_events: [1,6,12,13,19,104,219,1001,1125,1126,1129,7000,7022,7023,7024,7026,7031,7032,7034,7045]
+wincollect_agent_filter_application_nsa_events: [1,2,865,866,867,868,882,1000,1001,1002,1022,1033,1511,1518]
+wincollect_agent_filter_dns_nsa_events: [256,257]
+wincollect_agent_tuning_profiles:
+  - type: Default (Endpoint)
+    minlogstoprocessperpass: 100
+    maxlogstoprocessperpass: 150
+  - type: Typical Server
+    minlogstoprocessperpass: 500
+    maxlogstoprocessperpass: 750
+  - type: High Event Rate Server
+    minlogstoprocessperpass: 1250
+    maxlogstoprocessperpass: 1875

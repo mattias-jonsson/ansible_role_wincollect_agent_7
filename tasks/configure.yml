@@ -1,0 +1,207 @@
+---
+
+- name: download AgentConfig.xml from target.
+  fetch:
+    src: '{{ wincollect_agent_install_dir }}\config\AgentConfig.xml'
+    dest: "/var/tmp/{{ 1000 | random | hash('md5') }}"
+    flat: yes
+  changed_when: false
+  register: agentconfig_fetched
+
+- name: custom query handling
+  block:
+    - name: create temporary template file
+      tempfile:
+        state: file
+      register: temporary_query_template
+      delegate_to: localhost
+      changed_when: false
+
+    - name: create temporary template from query variables
+      template:
+        src: tmplt_CustomQuery.xml.j2
+        dest: "{{ temporary_query_template.path }}"
+      delegate_to: localhost
+      changed_when: false
+      loop: "{{ wincollect_agent_custom_querys }}"
+
+    - name: encode temporary_query_template to base64
+      slurp:
+        src: "{{ temporary_query_template.path }}"
+      register: temporary_query_template_b64
+      delegate_to: localhost
+
+    - name: remove temporary query template
+      file:
+        path: "{{ temporary_query_template.path }}"
+        state: absent
+      changed_when: false
+      delegate_to: localhost
+
+- name: extract XML data blocks.
+  block:
+    - name: extract DeviceWindowsLog from AgentConfig.xml
+      shell: cat "{{ agentconfig_fetched.dest }}" | awk '/<Service version="[0-9.]*" classification="Service" type="DeviceType" module="DeviceWindowsLog" name="DeviceWindowsLog">/,/<\/Service>/' | tr -d "\r"
+      register: devicewindowslog_var
+      changed_when: false
+      delegate_to: localhost
+
+    - name: extract DestinationManager from AgentConfig.xml.
+      shell: cat "{{ agentconfig_fetched.dest }}" | awk '/<Service version="[0-9.]*" classification="Service" type="Service" module="WinCollectPlugin" name="DestinationManager">/,/<\/Service>/' | tr -d "\r"
+      register: destinationmanager_var
+      changed_when: false
+      delegate_to: localhost
+
+    - name: extract PayloadRouter from AgentConfig.xml.
+      shell: cat "{{ agentconfig_fetched.dest }}" | awk '/<Service classification="Service" type="Service" version="[0-9.]*" module="Routing" name="PayloadRouter">/,/<\/Service>/' | tr -d "\r"
+      register: payloadrouter_var
+      changed_when: false
+      delegate_to: localhost
+
+    - name: extract AgentCore from AgentConfig.xml.
+      shell: cat "{{ agentconfig_fetched.dest }}" | awk '/<Service classification="Static" type="Service" version="[0-9.]*" module="AgentCore" name="AgentCore">/,/<\/Service>/' | tr -d "\r"
+      register: agentcore_var
+      changed_when: false
+      delegate_to: localhost
+
+- name: delete fetched AgentConfig.xml file.
+  file:
+    path: "{{ agentconfig_fetched.dest }}"
+    state: absent
+  changed_when: false
+  delegate_to: localhost
+
+- name: PayloadRouter block.
+  block:
+    - name: create temporary PayloadRouter XML.
+      copy:
+        dest: "/var/tmp/{{ 1000 | random | hash('md5') }}"
+        content: "{{ payloadrouter_var.stdout }}"
+      register: payloadrouter_section
+      changed_when: false
+      delegate_to: localhost
+
+    - name: check if PayloadRouter configuration needs patching.
+      template:
+        src: tmplt_PayloadRouter.xml.j2
+        dest: "{{ payloadrouter_section.dest }}"
+      check_mode: yes
+      delegate_to: localhost
+      register: payloadrouter_needs_patching
+
+    - name: delete temporary PayloadRouter XML.
+      file:
+        path: "{{ payloadrouter_section.dest }}"
+        state: absent
+      changed_when: false
+      delegate_to: localhost
+
+    - name: create PayloadRouter patch template.
+      become: true
+      win_template:
+        src: tmplt_PayloadRouter.xml.j2
+        dest: '{{ wincollect_agent_install_dir }}\patch\service_PayloadRouter.xml'
+      when: payloadrouter_needs_patching.changed
+
+- name: AgentCore block.
+  block:
+    - name: create temporary AgentCore XML.
+      copy:
+        dest: "/var/tmp/{{ 1000 | random | hash('md5') }}"
+        content: "{{ agentcore_var.stdout }}"
+      register: agentcore_section
+      changed_when: false
+      delegate_to: localhost
+
+    - name: check if AgentCore configuration needs patching.
+      template:
+        src: tmplt_AgentCore.xml.j2
+        dest: "{{ agentcore_section.dest }}"
+      check_mode: yes
+      delegate_to: localhost
+      register: agentcore_needs_patching
+
+    - name: delete temporary AgentCore XML.
+      file:
+        path: "{{ agentcore_section.dest }}"
+        state: absent
+      changed_when: false
+      delegate_to: localhost
+
+    - name: create AgentCore patch template.
+      become: true
+      win_template:
+        src: tmplt_AgentCore.xml.j2
+        dest: '{{ wincollect_agent_install_dir }}\patch\service_AgentCore.xml'
+      when: agentcore_needs_patching.changed
+
+- name: DestinationManager block.
+  block:
+    - name: create temporary DestinationManager XML.
+      copy:
+        dest: "/var/tmp/{{ 1000 | random | hash('md5') }}"
+        content: "{{ destinationmanager_var.stdout }}"
+      register: destinationmanager_section
+      changed_when: false
+      delegate_to: localhost
+
+    - name: check if DestinationManager configuration needs patching.
+      template:
+        src: tmplt_DestinationManager.xml.j2
+        dest: "{{ destinationmanager_section.dest }}"
+      check_mode: yes
+      delegate_to: localhost
+      register: destinationmanager_needs_patching
+
+    - name: delete temporary DestinationManager XML.
+      file:
+        path: "{{ destinationmanager_section.dest }}"
+        state: absent
+      changed_when: false
+      delegate_to: localhost
+
+    - name: create DestinationManager patch template.
+      become: true
+      win_template:
+        src: tmplt_DestinationManager.xml.j2
+        dest: '{{ wincollect_agent_install_dir }}\patch\service_DestinationManager.xml'
+      when: destinationmanager_needs_patching.changed
+
+- name: DeviceWindowsLog block.
+  block:
+    - name: create temporary WinEvent XML.
+      copy:
+        dest: "/var/tmp/{{ 1000 | random | hash('md5') }}"
+        content: "{{ devicewindowslog_var.stdout }}"
+      register: winevent_section
+      changed_when: false
+      delegate_to: localhost
+
+    - name: check if DeviceWindowsLog configuration needs patching.
+      template:
+        src: tmplt_DeviceWindowsLog.xml.j2
+        dest: "{{ winevent_section.dest }}"
+      check_mode: yes
+      delegate_to: localhost
+      register: wincollect_needs_patching
+
+    - name: delete temporary WinEvent XML.
+      file:
+        path: "{{ winevent_section.dest }}"
+        state: absent
+      changed_when: false
+      delegate_to: localhost
+
+    - name: create patch template.
+      become: true
+      win_template:
+        src: tmplt_DeviceWindowsLog.xml.j2
+        dest: '{{ wincollect_agent_install_dir }}\patch\service_DeviceWindowsLog.xml'
+      when: wincollect_needs_patching.changed
+
+- name: make sure WinCollect is started and set to start automatically.
+  become: true
+  win_service:
+    name: wincollect
+    state: started
+    start_mode: auto

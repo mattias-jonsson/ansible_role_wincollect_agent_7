@@ -1,0 +1,65 @@
+<Service version="{{ wincollect_agent_version }}" classification="Service" type="DeviceType" module="DeviceWindowsLog" name="DeviceWindowsLog">
+	<Environment>
+		<Parameter name="DeviceThreadPoolType" value="AdaptiveThreadPool"/>
+		<Parameter name="TimestampFormat" value="Seconds"/>
+		<Parameter name="AdaptiveThreadPool.ReaderThreadsMax" value="500"/>
+		<Parameter name="AdaptiveThreadPool.ReaderThreadsMin" value="5"/>
+		<Parameter name="AdaptiveThreadPool.ReaderBacklogSamplePeriodMillis" value="200"/>
+		<Parameter name="MinEventMonitorThreads" value="5"/>
+		<Parameter name="MaxEventMonitorThreads" value="250"/>
+		<Parameter name="EventLogMonitor.RetryTimeoutMillis" value="60000"/>
+		<Parameter name="DefaultThrottleTimeout" value="1500"/>
+		<Parameter name="DefaultEventLogPollProtocol" value="MSEVEN6"/>
+	</Environment>
+	<InstanceData>
+		<Instance enabled="true" name="{{ wincollect_devicewindowslog_instance_name }}">
+			<Environment>
+				<Parameter name="DeviceAddress" value="{{ wincollect_agent_hostname }}"/>
+				<Parameter name="RemoteMachine" value="{{ wincollect_agent_hostname }}"/>
+				<Parameter name="Filter.DNS Server.Enabled" value="{{ 'true' if (wincollect_agent_filter_dns['type'] | lower == 'blacklist' and wincollect_agent_filter_dns['events'] | length > 0) or (wincollect_agent_filter_dns['type'] | lower == 'whitelist' and wincollect_agent_filter_dns['events'] | length > 0) else 'false' }}"/>
+				<Parameter name="EventTypeFilterFailureAudit" value="true"/>
+				<Parameter name="EventLogPollProtocol" value="MSEVEN6"/>
+				<Parameter name="Log.Security" value="{{ wincollect_agent_log_security | lower }}"/>
+				<Parameter name="Filter.Application.Enabled" value="{{ 'true' if (wincollect_agent_filter_application['type'] | lower == 'blacklist' and wincollect_agent_filter_application['events'] | length > 0) or (wincollect_agent_filter_application['type'] | lower == 'whitelist' and wincollect_agent_filter_application['events'] | length > 0) or wincollect_agent_filter_application['type'] | lower == 'nsalist' else 'false' }}"/>
+				<Parameter name="ADLookup.Enabled" value="false"/>
+				<Parameter name="ThrottleTimeout" value="1000"/>
+				<Parameter name="Filter.DNS Server.Param" value="{{ wincollect_agent_filter_dns['events'] | sort | join(',')  if wincollect_agent_filter_dns['type'] | lower == 'blacklist' or wincollect_agent_filter_dns['type'] | lower == 'whitelist' else '' }}"/>
+				<Parameter name="Filter.File Replication Service.Enabled" value="{{ 'true' if (wincollect_agent_filter_filereplicationservice['type'] | lower == 'blacklist' and wincollect_agent_filter_filereplicationservice['events'] | length > 0) or (wincollect_agent_filter_filereplicationservice['type'] | lower == 'whitelist' and wincollect_agent_filter_filereplicationservice['events'] | length > 0) else 'false' }}"/>
+				<Parameter name="Filter.Application.Type" value="{{ 'No Filtering' if wincollect_agent_filter_application['events'] | length < 1 and wincollect_agent_filter_application['type'] | lower != 'nsalist' else 'Blacklist' if wincollect_agent_filter_application['type'] | lower == 'blacklist' else 'Whitelist' if wincollect_agent_filter_application['type'] | lower == 'whitelist' else 'No Filtering' if wincollect_agent_filter_application['type'] | lower == 'nofilter' else 'NSAlist' if wincollect_agent_filter_application['type'] | lower == 'nsalist' }}"/>
+				<Parameter name="Filter.Directory Service.Param" value="{{ wincollect_agent_filter_directoryservice['events'] | sort | join(',')  if wincollect_agent_filter_directoryservice['type'] | lower == 'blacklist' or wincollect_agent_filter_directoryservice['type'] | lower == 'whitelist' else '' }}"/>
+				<Parameter name="Log.Application" value="{{ wincollect_agent_log_application | lower }}"/>
+				<Parameter name="Filter.System.Type" value="{{ 'No Filtering' if wincollect_agent_filter_system['events'] | length < 1 and wincollect_agent_filter_system['type'] | lower != 'nsalist' else 'Blacklist' if wincollect_agent_filter_system['type'] | lower == 'blacklist' else 'Whitelist' if wincollect_agent_filter_system['type'] | lower == 'whitelist' else 'No Filtering' if wincollect_agent_filter_system['type'] | lower == 'nofilter' else 'NSAlist' if wincollect_agent_filter_system['type'] | lower == 'nsalist' }}"/>
+				<Parameter name="Filter.DNS Server.Type" value="{{ 'No Filtering' if wincollect_agent_filter_dns['events'] | length < 1 else 'Blacklist' if wincollect_agent_filter_dns['type'] | lower == 'blacklist' else 'Whitelist' if wincollect_agent_filter_dns['type'] | lower == 'whitelist' else 'No Filtering' if wincollect_agent_filter_dns['type'] | lower == 'nofilter' }}"/>
+				<Parameter name="Filter.Application.Param" value="{{ wincollect_agent_filter_application['events'] | sort | join(',') if wincollect_agent_filter_application['type'] | lower == 'blacklist' or wincollect_agent_filter_application['type'] | lower == 'whitelist' else (wincollect_agent_filter_application_nsa_events | union(wincollect_agent_filter_application.events) | sort | join(',')) if wincollect_agent_filter_application['type'] | lower == 'nsalist' else '' }}"/>
+				<Parameter name="Filter.System.Param" value="{{ wincollect_agent_filter_system['events'] | sort | join(',') if wincollect_agent_filter_system['type'] | lower == 'blacklist' or wincollect_agent_filter_system['type'] | lower == 'whitelist' else (wincollect_agent_filter_system_nsa_events | union(wincollect_agent_filter_system.events) | sort | join(',')) if wincollect_agent_filter_system['type'] | lower == 'nsalist' else '' }}"/>
+				<Parameter name="Log.Directory Service" value="{{ wincollect_agent_log_directory_service | lower }}"/>
+				<Parameter name="ADLookup.DomainControllerName" value=""/>
+				<Parameter name="Log.File Replication Service" value="{{ wincollect_agent_log_file_replication_service | lower  }}"/>
+				<Parameter name="Filter.Directory Service.Enabled" value="{{ 'true' if (wincollect_agent_filter_directoryservice['type'] | lower == 'blacklist' and wincollect_agent_filter_directoryservice['events'] | length > 0) or (wincollect_agent_filter_directoryservice['type'] | lower == 'whitelist' and wincollect_agent_filter_directoryservice['events'] | length > 0) else 'false' }}"/>
+				<Parameter name="CustomQuery.Base64" value="{{ temporary_query_template_b64['content'] }}"/>
+				<Parameter name="Filter.Security.Param" value="{{ wincollect_agent_filter_security['events'] | sort | join(',') if wincollect_agent_filter_security['type'] | lower == 'blacklist' or wincollect_agent_filter_security['type'] | lower == 'whitelist' else (wincollect_agent_filter_security_nsa_events | union(wincollect_agent_filter_security.events) | sort | join(',')) if wincollect_agent_filter_security['type'] | lower == 'nsalist' else '' }}"/>
+				<Parameter name="EventRateTuningProfile" value="{{ wincollect_agent_profile }}"/>
+				<Parameter name="Local.System" value="true"/>
+				<Parameter name="EventTypeFilterError" value="true"/>
+				<Parameter name="EventTypeFilterWarn" value="true"/>
+				<Parameter name="EventTypeFilterInfo" value="true"/>
+				<Parameter name="Filter.File Replication Service.Param" value="{{ wincollect_agent_filter_filereplicationservice['events'] | sort | join(',') if wincollect_agent_filter_filereplicationservice['type'] | lower == 'blacklist' or wincollect_agent_filter_filereplicationservice['type'] | lower == 'whitelist' else '' }}"/>
+				<Parameter name="Filter.File Replication Service.Type" value="{{ 'No Filtering' if wincollect_agent_filter_filereplicationservice['events'] | length < 1 else 'Blacklist' if wincollect_agent_filter_filereplicationservice['type'] | lower == 'blacklist' else 'Whitelist' if wincollect_agent_filter_filereplicationservice['type'] | lower == 'whitelist' else 'No Filtering' if wincollect_agent_filter_filereplicationservice['type'] | lower == 'nofilter' }}"/>
+				<Parameter name="EventTypeFilterSuccessAudit" value="true"/>
+				<Parameter name="Filter.Directory Service.Type" value="{{ 'No Filtering' if wincollect_agent_filter_directoryservice['events'] | length < 1 else 'Blacklist' if wincollect_agent_filter_directoryservice['type'] | lower == 'blacklist' else 'Whitelist' if wincollect_agent_filter_directoryservice['type'] | lower == 'whitelist' else 'No Filtering' if wincollect_agent_filter_directoryservice['type'] | lower == 'nofilter' }}"/>
+				<Parameter name="Filter.Security.Type" value="{{ 'No Filtering' if wincollect_agent_filter_security['events'] | length < 1 and wincollect_agent_filter_security['type'] | lower != 'nsalist' else 'Blacklist' if wincollect_agent_filter_security['type'] | lower == 'blacklist' else 'Whitelist' if wincollect_agent_filter_security['type'] | lower == 'whitelist' else 'No Filtering' if wincollect_agent_filter_security['type'] | lower == 'nofilter' else 'NSAlist' if wincollect_agent_filter_security['type'] | lower == 'nsalist' }}"/>
+				<Parameter name="Application" value="None"/>
+				<Parameter name="Log.System" value="{{ wincollect_agent_log_system | lower  }}"/>
+				<Parameter name="Log.ForwardedEvents" value="{{ wincollect_agent_log_forwardedevents | lower }}"/>
+				<Parameter name="Filter.Security.Enabled" value="{{ 'true' if (wincollect_agent_filter_security['type'] | lower == 'blacklist' and wincollect_agent_filter_security['events'] | length > 0) or (wincollect_agent_filter_security['type'] | lower == 'whitelist' and wincollect_agent_filter_security['events'] | length > 0) or wincollect_agent_filter_security['type'] | lower == 'nsalist' else 'false' }}"/>
+				<Parameter name="Filter.System.Enabled" value="{{ 'true' if (wincollect_agent_filter_system['type'] | lower == 'blacklist' and wincollect_agent_filter_system['events'] | length > 0) or (wincollect_agent_filter_system['type'] | lower == 'whitelist' and wincollect_agent_filter_system['events'] | length > 0) or wincollect_agent_filter_system['type'] | lower == 'nsalist' else 'false' }}"/>
+				<Parameter name="Log.DNS Server" value="{{ wincollect_agent_log_forwardedevents | lower }}"/>
+				<Parameter name="ADLookup.DNSDomainName" value=""/>
+				<Parameter name="RemoteMachinePollInterval" value="3000"/>
+				<Parameter name="MinLogsToProcessPerPass" value="{{ wincollect_agent_minlogstoprocess }}"/>
+				<Parameter name="MaxLogsToProcessPerPass" value="{{ wincollect_agent_maxlogstoprocess }}"/>
+				<Parameter name="Login.Handle" value="0"/>
+			</Environment>
+		</Instance>
+	</InstanceData>
+</Service>

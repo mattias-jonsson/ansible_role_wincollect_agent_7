@@ -1,0 +1,109 @@
+---
+
+- name: get current QRadar WinCollect agent install location.
+  win_reg_stat:
+    path: HKLM:\SYSTEM\ControlSet001\Services\WinCollect
+    name: ImagePath
+  register: wincollect_agent_installed_path_reg
+
+- name: check if QRadar WinCollect binary exists.
+  win_stat:
+    path: "{{ wincollect_agent_installed_path_reg.value | regex_replace('\\\"', '') }}"
+  register: wincollect_agent_installed_binary
+  when: wincollect_agent_installed_path_reg.exists
+
+- name: set fact for agent install path
+  set_fact:
+    wincollect_agent_install_path: "{{ wincollect_agent_installed_binary.stat.path | regex_search('(.+)\\\\bin\\\\WinCollectSvc.exe', '\\1' ) | join('\n')  if wincollect_agent_installed_binary.stat.path is defined }}"
+
+- name: get contents of install_config.txt
+  slurp:
+    src: '{{ wincollect_agent_install_path }}\config\install_config.txt'
+  register: wincollect_install_config
+  when: wincollect_agent_installed_path_reg.exists
+
+- name: set fact for agent managed/unmanaged
+  set_fact:
+    wincollect_managed: "{{ wincollect_install_config['content'] | b64decode | regex_search('ConfigurationServer=(.+)', '\\1') | first | trim | length > 0 if wincollect_agent_installed_binary.stat.path is defined else 'false' }}"
+
+- name: check uninstallstring
+  win_reg_stat:
+    path: HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{{ wincollect_product_id }}
+    name: UninstallString
+  register: wincollect_uninstallstring
+
+- name: Add Uninstallstring to registry if missing.
+  become: true
+  win_regedit:
+    path: HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{{ wincollect_product_id }}
+    name: UninstallString
+    data: "MsiExec.exe /X{{'{'}}wincollect_product_id{{'}'}}"
+    type: expandstring
+  when: not wincollect_uninstallstring.exists
+
+- name: QRadar WinCollect agent upgrade block.
+  block:
+    - name: get installed QRadar WinCollect agent version
+      win_file_version:
+        path: "{{ wincollect_agent_installed_path_reg.value | regex_replace('\\\"', '') }}"
+      register: wincollect_agent_installed_version
+
+    - name: starting upgrade QRadar WinCollect agent block.
+      block:
+        - name: create a temporary file for downloaded package.
+          win_tempfile:
+            state: file
+          register: temp_file_name
+          
+        - name: upload QRadar WinCollect agent installer
+          win_copy:
+            src: "{{ wincollect_agent_installer_file }}"
+            dest: "{{ temp_file_name.path }}"
+
+        - name: make sure WinCollect is stopped before upgrade.
+          become: true
+          win_service:
+            name: wincollect
+            state: stopped
+
+        - name: upgrade QRadar WinCollect agent.    
+          become: yes
+          win_command: "{{ temp_file_name.path }} {{ wincollect_agent_install_parameters }}"
+          register: wincollect_agent_install
+          failed_when: wincollect_agent_install.rc != 0
+      when: wincollect_agent_installed_version.win_file_version.file_version is version(wincollect_agent_version, '<')
+  when: wincollect_agent_installed_path_reg.exists and wincollect_agent_installed_binary.stat.exists
+
+- name: QRadar WinCollect agent install block.
+  block:
+    - name: create a temporary file for downloaded package.
+      win_tempfile:
+        state: file
+      register: temp_file_name
+      
+    - name: upload QRadar WinCollect agent installer.
+      win_copy:
+        src: "{{ wincollect_agent_installer_file }}"
+        dest: "{{ temp_file_name.path }}"
+
+    - name: make sure WinCollect is stopped before install.
+      become: true
+      win_service:
+        name: wincollect
+        state: stopped
+      when: wincollect_managed
+
+    - name: uninstall WinCollect since it's under Borg influense.
+      become: true
+      win_package:
+        product_id: '{{ wincollect_product_id }}'
+        state: absent
+        arguments: 'REMOVE_ALL_FILES=True /qn'
+      when: wincollect_managed
+
+    - name: install QRadar WinCollect agent.    
+      become: yes
+      win_command: "{{ temp_file_name.path }} {{ wincollect_agent_install_parameters }}"
+      register: wincollect_agent_install
+      failed_when: wincollect_agent_install.rc != 0
+  when: not (wincollect_agent_installed_path_reg.exists and wincollect_agent_installed_binary.stat.exists) or wincollect_managed

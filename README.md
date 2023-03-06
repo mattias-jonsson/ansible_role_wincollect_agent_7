@@ -1,7 +1,7 @@
 Ansible Role: ansible_role_wincollect_agent_7
 =========
 
-Installs/upgrades/configures IBM WinCollect 7 agent.  
+Installs/upgrades/configures IBM WinCollect 7 agent.
 
 WARNING When using XPath filters, ensure that no more than 10 filters are applied or system performance may be poor.
 This role supports the following Operating Systems:
@@ -16,51 +16,20 @@ This role supports the following Operating Systems:
 Requirements
 ------------
 
-This role depends on `community.general` Ansible collection
+This role depends on `community.general`, `ansible.windows`, `community.windows` Ansible collections.
 
 Role Variables
 --------------
 
 Available variables are listed below, along with default values where applicable (see `defaults/main.yml`):
 
-    wincollect_agent_installer_file:
 
-References the path to IBM WinCollect installer ex, `files/wincollect-7.3.0-24.x64.exe`.
-Note that the file version in the filename, 7.3.0 in this case is used by the role to assess whether the agent is to be updated or not.  
-
-    wincollect_target_address:
-
-References the IP or FQDN of the IBM Qradar system recieving the events.  
-
-    wincollect_agent_filter_*:
-
-These variables contains filter settings for the relevant eventlog source. For each source two variables needs to be set, `type` and `events`. 
-The `type` variable must be set to any of the following types:  
-
-* **NSAlist** - Contains a list of events to monitor recommended by NSA.
-* **Whitelist** - Only send the whitelisted events to IBM QRadar.
-* **Blacklist** - Blacklist these events will prevent the agent to forwarding the events to IBM QRadar.
-* **Nofilter** - No filtering is performed on the events in this eventlogsource.
-
-The `events` variable should contain a list of events to be added to the eventtype specified in the `type` variable. 
-For **NSAlist** the events will be added to the **NSAlist** filters as events to monitor, any duplicate events will be removed.  
-
-    wincollect_agent_custom_querys:
-
-`wincollect_agent_custom_querys` can contain custom XPath queries to be performed. To enable a custom Xpath query, two variables need to be set, `path` and `query`.
-
-The `path` variable should contain the path for the query ex **Microsoft-Windows-Windows Firewall With Advanced Security/Firewall**  
-The `query` should contain the XPath query to perform, ex **[System[(Level=4 or Level=0) and ( (EventID=2004 or EventID=2005 or EventID=2006 or EventID=2009 or EventID=2033) )]]**  
-The query above would result in the following XPath query to be set in the **AgentConf.xml** of the IBM WinCollect agent.  
-
-```xml
-<QueryList>
-<Query Id="0" Path="Microsoft-Windows-Windows Firewall With Advanced Security/Firewall">
-<Select Path="Microsoft-Windows-Windows Firewall With Advanced Security/Firewall">[System[(Level=4 or Level=0) and ( (EventID=2004 or EventID=2005 or EventID=2006 or EventID=2009 or EventID=2033) )]]</Select>
-</Query>
-</QueryList>
-```
-
+| Variable | Required | Default | Comments |
+| -------- | -------- | ------- | -------- |
+| `wincollect_agent_installer_file` | Yes | files/wincollect-7.3.0-24.x64.exe | References the path to IBM WinCollect installer ex, `files/wincollect-7.3.0-24.x64.exe`. Note that the file version in the filename, 7.3.0 in this case is used by the role to assess whether the agent is to be updated or not. |
+| `wincollect_target_address` | Yes | | References the IP or FQDN of the IBM Qradar system recieving the events. |
+| `wincollect_agent_filter_*` | Yes | | These variables contains filter settings for the relevant eventlog source. For each source two variables needs to be set, `type` and `events`. The `type` variable must be set to any of the following types: `NSAlist` - contains a list of events to monitor recommended by NSA. `Whitelist` - only send the whitelisted events to IBM QRadar. `Blacklist` - blacklist these events will prevent the agent to forwarding the events to IBM QRadar. `Nofilter` - no filtering is performed on the events in this eventlogsource. The `events` variable should contain a list of events to be added to the eventtype specified in the `type` variable. For `NSAlist` the events will be added to the `NSAlist` filters as events to monitor, any duplicate events will be removed. See example playbook below. |
+| `wincollect_agent_custom_querys` | No | | Contains custom XPath queries to be performed. To enable a custom Xpath query, two variables need to be set, `path` and `query`. The `path` variable should contain the path for the query ex `Microsoft-Windows-Windows Firewall With Advanced Security/Firewall` The `query` should contain the XPath query to perform, ex `[System[(Level=4 or Level=0) and ( (EventID=2004 or EventID=2005 or EventID=2006 or EventID=2009 or EventID=2033) )]]` See example config below. |
 
 Dependencies
 ------------

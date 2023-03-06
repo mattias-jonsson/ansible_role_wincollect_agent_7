@@ -6,14 +6,14 @@ collections:
 galaxy_info:
   author: Mattias Jonsson
   description: Installs/upgrades/configures IBM WinCollect 7 agent on supported Operating Systems.
-  min_ansible_version: 2.9.27
+  min_ansible_version: 2.13.0
   role_name: ansible_role_wincollect_agent_7
   license: MIT
   platforms:
-  - name: Windows
-    versions:
-    - "2012"
-    - "2012R2"
-    - "2016"
-    - "2019"
-    - "2022"
+    - name: Windows
+      versions:
+        - "2012"
+        - "2012R2"
+        - "2016"
+        - "2019"
+        - "2022"

@@ -42,5 +42,3 @@ wincollect_agent_filter_directoryservice:
 wincollect_agent_filter_forwardedevents:
   type: nofilter
   events: []
-
-

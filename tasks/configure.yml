@@ -21,6 +21,7 @@
       ansible.builtin.template:
         src: tmplt_CustomQuery.xml.j2
         dest: "{{ temporary_query_template.path }}"
+        mode: '0600'
       delegate_to: localhost
       changed_when: false
       loop: "{{ wincollect_agent_custom_querys }}"
@@ -77,6 +78,7 @@
       ansible.builtin.copy:
         dest: "/var/tmp/{{ 1000 | random | hash('md5') }}"
         content: "{{ payloadrouter_var.stdout }}"
+        mode: '0600'
       register: payloadrouter_section
       changed_when: false
       delegate_to: localhost
@@ -85,6 +87,7 @@
       ansible.builtin.template:
         src: tmplt_PayloadRouter.xml.j2
         dest: "{{ payloadrouter_section.dest }}"
+        mode: '0600'
       check_mode: true
       delegate_to: localhost
       register: payloadrouter_needs_patching
@@ -109,6 +112,7 @@
       ansible.builtin.copy:
         dest: "/var/tmp/{{ 1000 | random | hash('md5') }}"
         content: "{{ agentcore_var.stdout }}"
+        mode: '0600'
       register: agentcore_section
       changed_when: false
       delegate_to: localhost
@@ -117,6 +121,7 @@
       ansible.builtin.template:
         src: tmplt_AgentCore.xml.j2
         dest: "{{ agentcore_section.dest }}"
+        mode: '0600'
       check_mode: true
       delegate_to: localhost
       register: agentcore_needs_patching
@@ -141,6 +146,7 @@
       ansible.builtin.copy:
         dest: "/var/tmp/{{ 1000 | random | hash('md5') }}"
         content: "{{ destinationmanager_var.stdout }}"
+        mode: '0600'
       register: destinationmanager_section
       changed_when: false
       delegate_to: localhost
@@ -149,6 +155,7 @@
       ansible.builtin.template:
         src: tmplt_DestinationManager.xml.j2
         dest: "{{ destinationmanager_section.dest }}"
+        mode: '0600'
       check_mode: true
       delegate_to: localhost
       register: destinationmanager_needs_patching
@@ -173,6 +180,7 @@
       ansible.builtin.copy:
         dest: "/var/tmp/{{ 1000 | random | hash('md5') }}"
         content: "{{ devicewindowslog_var.stdout }}"
+        mode: '0600'
       register: winevent_section
       changed_when: false
       delegate_to: localhost
@@ -181,6 +189,7 @@
       ansible.builtin.template:
         src: tmplt_DeviceWindowsLog.xml.j2
         dest: "{{ winevent_section.dest }}"
+        mode: '0600'
       check_mode: true
       delegate_to: localhost
       register: wincollect_needs_patching

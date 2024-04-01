@@ -51,7 +51,7 @@
   ansible.builtin.assert:
     that:
       - wincollect_agent_7_installed_version.win_file_version.file_version is version(8.0, '<')
-      - wincollect_agent_7_installed_version.win_file_version.file_version is version(7.0, '>')
+      - wincollect_agent_7_installed_version.win_file_version.file_version is version(7.0, '>=')
     quiet: true
     msg: 'This role only supports IBM WinCollect 7'
   when: wincollect_agent_7_installed_path_reg.exists and wincollect_agent_7_installed_binary.stat.exists

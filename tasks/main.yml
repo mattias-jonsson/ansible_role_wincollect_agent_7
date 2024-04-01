@@ -8,6 +8,7 @@
       ansible_distribution is search("Microsoft Windows Server 2022") or
       ansible_distribution is search("Microsoft Windows 10") or
       ansible_distribution is search("Microsoft Windows 11")
+    quiet: true
     msg: "{{ ansible_distribution }} is not a supported Operating System for this role."
 
 - name: Include check tasks.

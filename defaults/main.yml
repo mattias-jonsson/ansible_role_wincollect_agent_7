@@ -8,25 +8,23 @@ wincollect_agent_7_install_parameters: >
   '/s /v"/qn INSTALLDIR=\"{{ wincollect_agent_7_install_dir }}\"
   STATUSSERVER={{ wincollect_target_address }}
   LOG_SOURCE_AUTO_CREATION_ENABLED=True
-  LOG_SOURCE_AUTO_CREATION_PARAMETERS="
-  "Component1.AgentDevice=DeviceWindowsLog
-  &Component1.Action=create
-  &Component1.LogSourceName={{ wincollect_agent_7_hostname }}
-  &Component1.LogSourceIdentifier={{ wincollect_agent_7_hostname }}
-  &Component1.Dest.Name={{ wincollect_target_address }}
-  &Component1.Dest.Hostname={{ wincollect_target_address }}
-  &Component1.Dest.Port={{ wincollect_target_port }}
-  &Component1.Dest.Protocol={{ wincollect_target_protocol | upper }}
-  &Component1.Log.Security={{ wincollect_agent_7_log_security }}
-  &Component1.Log.System={{ wincollect_agent_7_log_system }}
-  &Component1.Log.Application={{ wincollect_agent_7_log_application }}
-  &Component1.Log.DNS+Server={{ wincollect_agent_7_log_dns_server }}
-  &Component1.Log.File+Replication+Service={{ wincollect_agent_7_log_file_replication_service }}
-  &Component1.Log.Directory+Service={{ wincollect_agent_7_log_directory_service }}
-  &Component1.RemoteMachinePollInterval=3000
-  &Component1.EventRateTuningProfile={{ wincollect_agent_7_tuning_profile }}
-  &Component1.MinLogsToProcessPerPass={{ wincollect_agent_7_min_logs_to_process }}
-  &Component1.MaxLogsToProcessPerPass={{ wincollect_agent_7_max_logs_to_process }}"""'
+  LOG_SOURCE_AUTO_CREATION_PARAMETERS=""Component1.AgentDevice=DeviceWindowsLog&Component1.Action=create&
+  Component1.LogSourceName={{ wincollect_agent_7_hostname }}&
+  Component1.LogSourceIdentifier={{ wincollect_agent_7_hostname }}&
+  Component1.Dest.Name={{ wincollect_target_address }}&
+  Component1.Dest.Hostname={{ wincollect_target_address }}&
+  Component1.Dest.Port={{ wincollect_target_port }}&
+  Component1.Dest.Protocol={{ wincollect_target_protocol | upper }}&
+  Component1.Log.Security=true&Component1.Log.System=true&
+  Component1.Log.Application=true&
+  Component1.Log.DNS+Server=true&
+  Component1.Log.File+Replication+Service=true&
+  Component1.Log.Directory+Service=true&
+  Component1.RemoteMachinePollInterval=3000&
+  Component1.EventRateTuningProfile=Typical+Server&
+  Component1.MinLogsToProcessPerPass=100&
+  Component1.MaxLogsToProcessPerPass=150
+  """'
 wincollect_agent_7_version: "{{ wincollect_agent_7_installer_file | regex_search('([0-9]\\.)+[0-9]-[0-9]+') | regex_replace('-','.') }}"
 wincollect_syslog_status_server: "{{ wincollect_target_address }}"
 #wincollect_target_address: 1.2.3.256 # A default value for the IP address or FQDN of the IBM QRadar system to receive events is not provided.
@@ -37,7 +35,7 @@ wincollect_target_protocol: udp
 wincollect_agent_7_min_logs_to_process: 500
 wincollect_agent_7_max_logs_to_process: 750
 wincollect_agent_7_tuning_profile: 'Default (Endpoint)'
-wincollect_agent_7_profile: 'Typical+Server'
+wincollect_agent_7_profile: 'Typical Server'
 
 ### Log Management
 wincollect_agent_7_log_application: true
@@ -50,10 +48,10 @@ wincollect_agent_7_log_system: true
 
 ### Event Filtering and Custom Queries
 wincollect_agent_7_filter_security:
-  type: blacklist
+  type: nsalist
   events: []
 wincollect_agent_7_filter_system:
-  type: whitelist
+  type: nsalist
   events: []
 wincollect_agent_7_filter_application:
   type: nsalist

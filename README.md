@@ -142,13 +142,25 @@ Example Playbook
         wincollect_agent_7_log_dns_server: false
         wincollect_agent_7_filter_security:
           type: nsalist
-          events: [4964,4947,4950,4954,4964,5031,5155]
+          events:
+            - 4964
+            - 4947
+            - 4950
+            - 4954
+            - 4964
+            - 5031
+            - 5155
         wincollect_agent_7_filter_system:
           type: nsalist
-          events: [104,1127,5025]
+          events:
+            - 104
+            - 1127
+            - 5025
         wincollect_agent_7_filter_application:
           type: nsalist
-          events: [2,104]
+          events:
+            - 2
+            - 104
         wincollect_agent_7_filter_dns:
           type: nofilter
           events: []

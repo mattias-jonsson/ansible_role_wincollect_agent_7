@@ -1,12 +1,12 @@
 ---
 
-- name: Get current QRadar WinCollect agent install location.
+- name: Get current IBM WinCollect agent install location.
   ansible.windows.win_reg_stat:
     path: HKLM:\SYSTEM\ControlSet001\Services\WinCollect
     name: ImagePath
   register: wincollect_agent_7_installed_path_reg
 
-- name: Check if QRadar WinCollect binary exists.
+- name: Check if IBM WinCollect binary exists.
   ansible.windows.win_stat:
     path: "{{ wincollect_agent_7_installed_path_reg.value | regex_replace('\\\"', '') }}"
   register: wincollect_agent_7_installed_binary
@@ -41,8 +41,17 @@
     type: expandstring
   when: not wincollect_uninstallstring.exists
 
-- name: Get installed QRadar WinCollect agent version
+- name: Get installed IBM WinCollect agent version
   community.windows.win_file_version:
     path: "{{ wincollect_agent_7_installed_path_reg.value | regex_replace('\\\"', '') }}"
   register: wincollect_agent_7_installed_version
+  when: wincollect_agent_7_installed_path_reg.exists and wincollect_agent_7_installed_binary.stat.exists
+
+- name: Assert that installed version is of WinCollect is version 7
+  ansible.builtin.assert:
+    that:
+      - wincollect_agent_7_installed_version.win_file_version.file_version is version(8.0, '<')
+      - wincollect_agent_7_installed_version.win_file_version.file_version is version(7.0, '>')
+    quiet: true
+    msg: 'This role only supports IBM WinCollect 7'
   when: wincollect_agent_7_installed_path_reg.exists and wincollect_agent_7_installed_binary.stat.exists

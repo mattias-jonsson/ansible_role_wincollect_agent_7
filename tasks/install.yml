@@ -10,7 +10,7 @@
     src: "{{ wincollect_agent_7_installer_file }}"
     dest: "{{ temp_file_name.path }}"
 
-- name: Check state of WinCollect service.
+- name: Check state of IBM WinCollect service.
   become: true
   ansible.windows.win_service:
     name: wincollect
@@ -19,14 +19,14 @@
   register: wincollect_service_status
   when: wincollect_agent_7_installed_binary.stat.exists | default(false)
 
-- name: Make sure WinCollect is stopped before install.
+- name: Make sure IBM WinCollect is stopped before install.
   become: true
   ansible.windows.win_service:
     name: wincollect
     state: stopped
   when: wincollect_service_status.state | default('') | lower == 'running'
 
-- name: Uninstall WinCollect if installed as managed installation.
+- name: Uninstall IBM WinCollect if installed as managed installation.
   become: true
   ansible.windows.win_package:
     product_id: '{{ wincollect_product_id }}'
@@ -34,7 +34,7 @@
     arguments: 'REMOVE_ALL_FILES=True /qn'
   when: wincollect_managed
 
-- name: Install QRadar WinCollect agent.
+- name: Install IBM WinCollect agent.
   become: true
   ansible.windows.win_command: "{{ temp_file_name.path }} {{ wincollect_agent_7_install_parameters }}"
   register: wincollect_agent_7_install

@@ -34,10 +34,10 @@ These variables define the setup and operational parameters for the WinCollect a
 | `wincollect_agent_7_installer_file`   | Yes      | `files/wincollect-7.3.0-24.x64.exe` | Path to the WinCollect installer file. Make sure to keep the name of installer file since version is detected based on the name. |
 | `wincollect_agent_7_install_parameters` | No     | See `defaults/main.yml` | Provides parameters for the WinCollect installation, configuring silent installation, status server, log source auto-creation, and other settings. |
 | `wincollect_agent_7_version`          | No       | Auto-detected from `wincollect_agent_7_installer_file` | The version of the WinCollect agent, determined from the installer file name. |
-| `wincollect_syslog_status_server`     | No       | `{{ wincollect_target_address }}` | The address of the syslog status server, defaulting to the QRadar system address. |
-| `wincollect_target_address`           | Yes      |  | The IP address or FQDN of the IBM QRadar system to receive events. |
-| `wincollect_target_port`              | No       | `514` | The port on which the IBM QRadar system listens for incoming events. |
-| `wincollect_target_protocol`          | No       | `udp` | The protocol used for sending events to IBM QRadar (`udp` or `tcp`). |
+| `wincollect_agent_7_syslog_status_server`     | No       | `{{ wincollect_agent_7_target_address }}` | The address of the syslog status server, defaulting to the QRadar system address. |
+| `wincollect_agent_7_target_address`           | Yes      |  | The IP address or FQDN of the IBM QRadar system to receive events. |
+| `wincollect_agent_7_target_port`              | No       | `514` | The port on which the IBM QRadar system listens for incoming events. |
+| `wincollect_agent_7_target_protocol`          | No       | `udp` | The protocol used for sending events to IBM QRadar (`udp` or `tcp`). |
 
 ### Performance Tuning
 
@@ -130,9 +130,9 @@ Example Playbook
 
       vars:
         wincollect_agent_7_installer_file: 'files/wincollect-7.3.0-24.x64.exe'
-        wincollect_target_address: 192.168.0.1
-        wincollect_target_protocol: udp
-        wincollect_target_port: 514
+        wincollect_agent_7_target_address: 192.168.0.1
+        wincollect_agent_7_target_protocol: udp
+        wincollect_agent_7_target_port: 514
         wincollect_agent_7_log_security: true
         wincollect_agent_7_log_application: true
         wincollect_agent_7_log_system: true

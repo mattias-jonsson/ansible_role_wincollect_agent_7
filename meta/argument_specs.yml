@@ -32,23 +32,23 @@ argument_specs:
         required: false
         default: "{{ wincollect_agent_7_installer_file | regex_search('([0-9]\\.)+[0-9]-[0-9]+') | regex_replace('-','.') }}"
         type: str
-      wincollect_syslog_status_server:
+      wincollect_agent_7_syslog_status_server:
         description:
           - "The address of the syslog status server, defaulting to the QRadar system address."
         required: false
-        default: '{{ wincollect_target_address }}'
+        default: '{{ wincollect_agent_7_target_address }}'
         type: str
-      wincollect_target_address:
+      wincollect_agent_7_target_address:
         description:
           - "The IP address or FQDN of the IBM QRadar system to receive events."
         required: true
         type: str
-      wincollect_target_port:
+      wincollect_agent_7_target_port:
         description: "The port on which the IBM QRadar system listens for incoming events."
         required: false
         default: 514
         type: int
-      wincollect_target_protocol:
+      wincollect_agent_7_target_protocol:
         description:
           - The protocol used for sending events to IBM QRadar (`udp` or `tcp`).
         required: false

@@ -24,10 +24,10 @@
 			<Module order="3" service_name="SyslogHeaderStage">
 				<Environment/>
 			</Module>
-			<Module order="4" service_name="{{ 'UDPSendStage' if wincollect_target_protocol | lower == 'udp' else 'TCPSendstage' if wincollect_target_protocol | lower == 'tcp' }}">
+			<Module order="4" service_name="{{ 'UDPSendStage' if wincollect_agent_7_target_protocol | lower == 'udp' else 'TCPSendstage' }}">
 				<Environment>
-					<Parameter name="TargetAddress" value="{{ wincollect_target_address }}"/>
-					<Parameter name="TargetPort" value="{{ wincollect_target_port }}"/>
+					<Parameter name="TargetAddress" value="{{ wincollect_agent_7_target_address }}"/>
+					<Parameter name="TargetPort" value="{{ wincollect_agent_7_target_port }}"/>
 				</Environment>
 			</Module>
 		</Instance>

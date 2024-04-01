@@ -6,15 +6,15 @@ wincollect_agent_7_install_dir: C:\Program Files\IBM\WinCollect
 # wincollect_agent_7_installer_file: 'files/wincollect-7.3.0-24.x64.exe'
 wincollect_agent_7_install_parameters: >
   '/s /v"/qn INSTALLDIR=\"{{ wincollect_agent_7_install_dir }}\"
-  STATUSSERVER={{ wincollect_target_address }}
+  STATUSSERVER={{ wincollect_agent_7_target_address }}
   LOG_SOURCE_AUTO_CREATION_ENABLED=True
   LOG_SOURCE_AUTO_CREATION_PARAMETERS=""Component1.AgentDevice=DeviceWindowsLog&Component1.Action=create&
   Component1.LogSourceName={{ wincollect_agent_7_hostname }}&
   Component1.LogSourceIdentifier={{ wincollect_agent_7_hostname }}&
-  Component1.Dest.Name={{ wincollect_target_address }}&
-  Component1.Dest.Hostname={{ wincollect_target_address }}&
-  Component1.Dest.Port={{ wincollect_target_port }}&
-  Component1.Dest.Protocol={{ wincollect_target_protocol | upper }}&
+  Component1.Dest.Name={{ wincollect_agent_7_target_address }}&
+  Component1.Dest.Hostname={{ wincollect_agent_7_target_address }}&
+  Component1.Dest.Port={{ wincollect_agent_7_target_port }}&
+  Component1.Dest.Protocol={{ wincollect_agent_7_target_protocol | upper }}&
   Component1.Log.Security=true&Component1.Log.System=true&
   Component1.Log.Application=true&
   Component1.Log.DNS+Server=true&
@@ -26,10 +26,10 @@ wincollect_agent_7_install_parameters: >
   Component1.MaxLogsToProcessPerPass=150
   """'
 wincollect_agent_7_version: "{{ wincollect_agent_7_installer_file | regex_search('([0-9]\\.)+[0-9]-[0-9]+') | regex_replace('-','.') }}"
-wincollect_syslog_status_server: "{{ wincollect_target_address }}"
-#wincollect_target_address: 1.2.3.256 # A default value for the IP address or FQDN of the IBM QRadar system to receive events is not provided.
-wincollect_target_port: 514
-wincollect_target_protocol: udp
+wincollect_agent_7_syslog_status_server: "{{ wincollect_agent_7_target_address }}"
+#wincollect_agent_7_target_address: 1.2.3.256 # A default value for the IP address or FQDN of the IBM QRadar system to receive events is not provided.
+wincollect_agent_7_target_port: 514
+wincollect_agent_7_target_protocol: udp
 
 ### Performance Tuning
 wincollect_agent_7_min_logs_to_process: 500

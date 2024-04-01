@@ -10,11 +10,21 @@
     src: "{{ wincollect_agent_7_installer_file }}"
     dest: "{{ temp_file_name.path }}"
 
+- name: Check state of WinCollect service.
+  become: true
+  ansible.windows.win_service:
+    name: wincollect
+  failed_when: false
+  changed_when: false
+  register: wincollect_service_status
+  when: wincollect_agent_7_installed_binary.stat.exists | default(false)
+
 - name: Make sure WinCollect is stopped before install.
   become: true
   ansible.windows.win_service:
     name: wincollect
     state: stopped
+  when: wincollect_service_status.state | default('') | lower == 'running'
 
 - name: Uninstall WinCollect if installed as managed installation.
   become: true

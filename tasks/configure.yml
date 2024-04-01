@@ -2,7 +2,7 @@
 
 - name: Download AgentConfig.xml from target.
   ansible.builtin.fetch:
-    src: '{{ wincollect_agent_install_dir }}\config\AgentConfig.xml'
+    src: '{{ wincollect_agent_7_install_dir }}\config\AgentConfig.xml'
     dest: "/var/tmp/{{ 1000 | random | hash('md5') }}"
     flat: true
   changed_when: false
@@ -24,7 +24,7 @@
         mode: '0600'
       delegate_to: localhost
       changed_when: false
-      loop: "{{ wincollect_agent_custom_querys }}"
+      loop: "{{ wincollect_agent_7_custom_queries }}"
 
     - name: Encode temporary_query_template to base64.
       ansible.builtin.slurp:
@@ -103,7 +103,7 @@
       become: true
       ansible.windows.win_template:
         src: tmplt_PayloadRouter.xml.j2
-        dest: '{{ wincollect_agent_install_dir }}\patch\service_PayloadRouter.xml'
+        dest: '{{ wincollect_agent_7_install_dir }}\patch\service_PayloadRouter.xml'
       when: payloadrouter_needs_patching.changed
 
 - name: AgentCore block.
@@ -137,7 +137,7 @@
       become: true
       ansible.windows.win_template:
         src: tmplt_AgentCore.xml.j2
-        dest: '{{ wincollect_agent_install_dir }}\patch\service_AgentCore.xml'
+        dest: '{{ wincollect_agent_7_install_dir }}\patch\service_AgentCore.xml'
       when: agentcore_needs_patching.changed
 
 - name: DestinationManager block.
@@ -171,7 +171,7 @@
       become: true
       ansible.windows.win_template:
         src: tmplt_DestinationManager.xml.j2
-        dest: '{{ wincollect_agent_install_dir }}\patch\service_DestinationManager.xml'
+        dest: '{{ wincollect_agent_7_install_dir }}\patch\service_DestinationManager.xml'
       when: destinationmanager_needs_patching.changed
 
 - name: DeviceWindowsLog block.
@@ -205,7 +205,7 @@
       become: true
       ansible.windows.win_template:
         src: tmplt_DeviceWindowsLog.xml.j2
-        dest: '{{ wincollect_agent_install_dir }}\patch\service_DeviceWindowsLog.xml'
+        dest: '{{ wincollect_agent_7_install_dir }}\patch\service_DeviceWindowsLog.xml'
       when: wincollect_needs_patching.changed
 
 - name: Make sure WinCollect is started and set to start automatically.

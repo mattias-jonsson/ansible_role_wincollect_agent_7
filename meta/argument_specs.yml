@@ -1,0 +1,211 @@
+---
+
+argument_specs:
+  main:
+    short_description: Installs/upgrades/configures IBM WinCollect 7 agent on supported Operating Systems.
+    options:
+      wincollect_agent_7_hostname:
+        description:
+          - "Hostname used by the WinCollect agent, defaulting to the Ansible-managed host's hostname."
+        required: false
+        default: '{{ ansible_hostname }}'
+        type: str
+      wincollect_agent_7_install_dir:
+        description:
+          - "Specifies the directory where the WinCollect agent will be installed."
+        required: false
+        default: 'C:\Program Files\IBM\WinCollect'
+        type: str
+      wincollect_agent_7_installer_file:
+        description:
+          - "Path to the WinCollect installer file. Make sure to keep the name of installer file since version is detected based on the name."
+        required: true
+        type: str
+      wincollect_agent_7_install_parameters:
+        description:
+          - "Provides parameters for the WinCollect installation, configuring silent installation, status server, log source auto-creation, and other settings."
+        required: false
+        default: "See defaults/main.yml"
+      wincollect_agent_7_version:
+        description:
+          - "The version of the WinCollect agent, determined from the installer file name."
+        required: false
+        default: "{{ wincollect_agent_7_installer_file | regex_search('([0-9]\\.)+[0-9]-[0-9]+') | regex_replace('-','.') }}"
+        type: str
+      wincollect_syslog_status_server:
+        description:
+          - "The address of the syslog status server, defaulting to the QRadar system address."
+        required: false
+        default: '{{ wincollect_target_address }}'
+        type: str
+      wincollect_target_address:
+        description:
+          - "The IP address or FQDN of the IBM QRadar system to receive events."
+        required: true
+        type: str
+      wincollect_target_port:
+        description: "The port on which the IBM QRadar system listens for incoming events."
+        required: false
+        default: 514
+        type: int
+      wincollect_target_protocol:
+        description:
+          - The protocol used for sending events to IBM QRadar (`udp` or `tcp`).
+        required: false
+        default: 'udp'
+        choices: [udp, tcp]
+        type: str
+      wincollect_agent_7_min_logs_to_process:
+        description:
+          - "Minimum threshold for the number of logs to process per cycle."
+        required: false
+        default: 500
+        type: int
+      wincollect_agent_7_max_logs_to_process:
+        description:
+          - "Maximum number of logs the agent will process in a given cycle."
+        required: false
+        default: 750
+        type: int
+      wincollect_agent_7_profile:
+        description:
+          - "Predefined performance profile for the agent. Adjust this setting based on the operational role of the server for optimal performance."
+        required: false
+        default: 'Typical+Server'
+        type: str
+      wincollect_agent_7_tuning_profile:
+        description:
+          - "Specifies the tuning profile for optimal performance based on the deployment environment."
+        required: false
+        default: 'Default (Endpoint)'
+        type: str
+      wincollect_agent_7_log_application:
+        description:
+          - "Enables logging for the Application event log."
+        required: false
+        default: true
+        type: bool
+      wincollect_agent_7_log_directory_service:
+        description:
+          - "Enables logging for the Directory Service event log."
+        required: false
+        type: bool
+      wincollect_agent_7_log_dns_server:
+        description:
+          - "Enables logging for the DNS Server event log."
+        required: false
+        type: bool
+      wincollect_agent_7_log_file_replication_service:
+        description:
+          - "Enables logging for the File Replication Service event log."
+        type: bool
+      wincollect_agent_7_log_forwardedevents:
+        description:
+          - "Enables logging for the Forwarded Events log."
+        required: false
+        type: bool
+      wincollect_agent_7_log_security:
+        description:
+          - "Enables logging for the Security event log."
+        required: false
+        type: bool
+      wincollect_agent_7_log_system:
+        description:
+          - "Enables logging for the System event log."
+        required: false
+        type: bool
+      wincollect_agent_7_filter_security:
+        type: dict
+        required: false
+        options:
+          type:
+            type: str
+            required: true
+            choices: [nsalist, whitelist, blacklist, nofilter]
+          events:
+            type: list
+            elements: int
+            required: false
+      wincollect_agent_7_filter_system:
+        type: dict
+        required: false
+        options:
+          type:
+            type: str
+            required: true
+            choices: [nsalist, whitelist, blacklist, nofilter]
+          events:
+            type: list
+            elements: int
+            required: false
+      wincollect_agent_7_filter_application:
+        type: dict
+        required: false
+        options:
+          type:
+            type: str
+            required: true
+            choices: [nsalist, whitelist, blacklist, nofilter]
+          events:
+            type: list
+            elements: int
+            required: false
+      wincollect_agent_7_filter_dns:
+        type: dict
+        required: false
+        options:
+          type:
+            type: str
+            required: true
+            choices: [nsalist, whitelist, blacklist, nofilter]
+          events:
+            type: list
+            elements: int
+            required: false
+      wincollect_agent_7_filter_filereplicationservice:
+        type: dict
+        required: false
+        options:
+          type:
+            type: str
+            required: true
+            choices: [nsalist, whitelist, blacklist, nofilter]
+          events:
+            type: list
+            elements: int
+            required: false
+      wincollect_agent_7_filter_directoryservice:
+        type: dict
+        required: false
+        options:
+          type:
+            type: str
+            required: true
+            choices: [nsalist, whitelist, blacklist, nofilter]
+          events:
+            type: list
+            elements: int
+            required: false
+      wincollect_agent_7_filter_forwardedevents:
+        type: dict
+        required: false
+        options:
+          type:
+            type: str
+            required: true
+            choices: [nsalist, whitelist, blacklist, nofilter]
+          events:
+            type: list
+            elements: int
+            required: false
+      wincollect_agent_7_custom_queries:
+        type: list
+        elements: dict
+        required: false
+        options:
+          path:
+            type: str
+            required: true
+          query:
+            type: str
+            required: true

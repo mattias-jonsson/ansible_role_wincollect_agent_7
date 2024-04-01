@@ -1,60 +1,122 @@
-Ansible Role: ansible_role_wincollect_agent_7
-=========
+# Ansible Role: wincollect_agent_7
 
-Installs/upgrades/configures IBM WinCollect 7 agent.
+This role installs, upgrades, and configures IBM WinCollect 7 agent on Windows versions (2016, 2019, 2022).
 
-WARNING When using XPath filters, ensure that no more than 10 filters are applied or system performance may be poor.
-This role supports the following Operating Systems:
+## Requirements
 
-<ul>
-<li>Windows Server 2016
-<li>Windows Server 2019
-<li>Windows Server 2022
-</ul>
+This role requires the `ansible.windows` and `community.windows` collections. If these are not already installed, you can acquire them using the following command:
 
+```shell
+ansible-galaxy collection install ansible.windows community.windows
 
-Requirements
-------------
-
-This role depends on `community.general`, `ansible.windows`, `community.windows` Ansible collections.
+```
 
 Role Variables
 --------------
 
 Available variables are listed below, along with default values where applicable (see `defaults/main.yml`):
 
+## Role Variables
 
-| Variable | Required | Default | Comments |
-| -------- | -------- | ------- | -------- |
-| `wincollect_agent_custom_querys` | No | | Contains custom XPath queries to be performed. To enable a custom Xpath query, two variables need to be set, `path` and `query`. The `path` variable should contain the path for the query ex `Microsoft-Windows-Windows Firewall With Advanced Security/Firewall` The `query` should contain the XPath query to perform, ex `[System[(Level=4 or Level=0) and ( (EventID=2004 or EventID=2005 or EventID=2006 or EventID=2009 or EventID=2033) )]]`. Keep this below 10 querys to avoid performance issues, See example config below. |
-| `wincollect_agent_filter_application` | No | | These variables contains filter settings for the relevant eventlog source. For each source two variables needs to be set, `type` and `events`. The `type` variable must be set to any of the following types: `NSAlist` - contains a list of events to monitor recommended by NSA. `Whitelist` - only send the whitelisted events to IBM QRadar. `Blacklist` - blacklist these events will prevent the agent to forwarding the events to IBM QRadar. `Nofilter` - no filtering is performed on the events in this eventlogsource. The `events` variable should contain a list of events to be added to the eventtype specified in the `type` variable. For `NSAlist` the events will be added to the `NSAlist` filters as events to monitor, any duplicate events will be removed. See example playbook below. |
-| `wincollect_agent_filter_directoryservice` | No | | These variables contains filter settings for the relevant eventlog source. For each source two variables needs to be set, `type` and `events`. The `type` variable must be set to any of the following types: `NSAlist` - contains a list of events to monitor recommended by NSA. `Whitelist` - only send the whitelisted events to IBM QRadar. `Blacklist` - blacklist these events will prevent the agent to forwarding the events to IBM QRadar. `Nofilter` - no filtering is performed on the events in this eventlogsource. The `events` variable should contain a list of events to be added to the eventtype specified in the `type` variable. For `NSAlist` the events will be added to the `NSAlist` filters as events to monitor, any duplicate events will be removed. See example playbook below. |
-| `wincollect_agent_filter_dns` | No | | These variables contains filter settings for the relevant eventlog source. For each source two variables needs to be set, `type` and `events`. The `type` variable must be set to any of the following types: `NSAlist` - contains a list of events to monitor recommended by NSA. `Whitelist` - only send the whitelisted events to IBM QRadar. `Blacklist` - blacklist these events will prevent the agent to forwarding the events to IBM QRadar. `Nofilter` - no filtering is performed on the events in this eventlogsource. The `events` variable should contain a list of events to be added to the eventtype specified in the `type` variable. For `NSAlist` the events will be added to the `NSAlist` filters as events to monitor, any duplicate events will be removed. See example playbook below. |
-| `wincollect_agent_filter_filereplicationservice` | No | | These variables contains filter settings for the relevant eventlog source. For each source two variables needs to be set, `type` and `events`. The `type` variable must be set to any of the following types: `NSAlist` - contains a list of events to monitor recommended by NSA. `Whitelist` - only send the whitelisted events to IBM QRadar. `Blacklist` - blacklist these events will prevent the agent to forwarding the events to IBM QRadar. `Nofilter` - no filtering is performed on the events in this eventlogsource. The `events` variable should contain a list of events to be added to the eventtype specified in the `type` variable. For `NSAlist` the events will be added to the `NSAlist` filters as events to monitor, any duplicate events will be removed. See example playbook below. |
-| `wincollect_agent_filter_forwardedevents` | No | | These variables contains filter settings for the relevant eventlog source. For each source two variables needs to be set, `type` and `events`. The `type` variable must be set to any of the following types: `NSAlist` - contains a list of events to monitor recommended by NSA. `Whitelist` - only send the whitelisted events to IBM QRadar. `Blacklist` - blacklist these events will prevent the agent to forwarding the events to IBM QRadar. `Nofilter` - no filtering is performed on the events in this eventlogsource. The `events` variable should contain a list of events to be added to the eventtype specified in the `type` variable. For `NSAlist` the events will be added to the `NSAlist` filters as events to monitor, any duplicate events will be removed. See example playbook below. |
-| `wincollect_agent_filter_security` | No | | These variables contains filter settings for the relevant eventlog source. For each source two variables needs to be set, `type` and `events`. The `type` variable must be set to any of the following types: `NSAlist` - contains a list of events to monitor recommended by NSA. `Whitelist` - only send the whitelisted events to IBM QRadar. `Blacklist` - blacklist these events will prevent the agent to forwarding the events to IBM QRadar. `Nofilter` - no filtering is performed on the events in this eventlogsource. The `events` variable should contain a list of events to be added to the eventtype specified in the `type` variable. For `NSAlist` the events will be added to the `NSAlist` filters as events to monitor, any duplicate events will be removed. See example playbook below. |
-| `wincollect_agent_filter_system` | No | | These variables contains filter settings for the relevant eventlog source. For each source two variables needs to be set, `type` and `events`. The `type` variable must be set to any of the following types: `NSAlist` - contains a list of events to monitor recommended by NSA. `Whitelist` - only send the whitelisted events to IBM QRadar. `Blacklist` - blacklist these events will prevent the agent to forwarding the events to IBM QRadar. `Nofilter` - no filtering is performed on the events in this eventlogsource. The `events` variable should contain a list of events to be added to the eventtype specified in the `type` variable. For `NSAlist` the events will be added to the `NSAlist` filters as events to monitor, any duplicate events will be removed. See example playbook below. |
-| `wincollect_agent_hostname` | No | {{ ansible_hostname }} | |
-| `wincollect_agent_install_dir` | No | C:\Program Files\IBM\WinCollect | |
-| `wincollect_agent_install_parameters` | No | See defaults/main.yml | |
-| `wincollect_agent_installer_file` | Yes | files/wincollect-7.3.0-24.x64.exe | References the path to IBM WinCollect installer ex, `files/wincollect-7.3.0-24.x64.exe`. Note that the file version in the filename, 7.3.0 in this case is used by the role to assess whether the agent is to be updated or not. |
-| `wincollect_agent_log_application` | No | true | |
-| `wincollect_agent_log_directory_service` | No | false | |
-| `wincollect_agent_log_dns_server` | No | false | |
-| `wincollect_agent_log_file_replication_service` | No | false | |
-| `wincollect_agent_log_forwardedevents` | No | false | |
-| `wincollect_agent_log_security` | No | true | |
-| `wincollect_agent_log_system` | No | true | |
-| `wincollect_agent_maxlogstoprocess` | No | 750 | |
-| `wincollect_agent_minlogstoprocess` | No | 500 | |
-| `wincollect_agent_profile` | No | Typical Server | |
-| `wincollect_agent_tuning_profile` | No | Default (Endpoint) | |
-| `wincollect_agent_version` | No | {{ wincollect_agent_installer_file | regex_search('([0-9]\\.)+[0-9]-[0-9]+') | regex_replace('-','.') }} | |
-| `wincollect_syslog_status_server` | No | {{ wincollect_target_address }} | |
-| `wincollect_target_address` | Yes | | References the IP or FQDN of the IBM Qradar system recieving the events. |
-| `wincollect_target_port` | No | 514 | |
-| `wincollect_target_protocol` | No | udp | |
+Variables enable customization of the IBM WinCollect agent's installation, configuration, and behavior. Below is a comprehensive list of variables you can configure:
 
+#### **Warning**
+When using XPath filters, ensure that no more than 10 filters are applied or system performance may be impacted.
+
+### General Configuration
+
+These variables define the setup and operational parameters for the WinCollect agent, including its installation path, connectivity details with IBM QRadar, and other settings.
+
+| Variable                              | Required | Default | Description |
+|---------------------------------------|----------|---------|-------------|
+| `wincollect_agent_7_hostname`         | No       | `{{ ansible_hostname }}` | Hostname used by the WinCollect agent, defaulting to the Ansible-managed host's hostname. |
+| `wincollect_agent_7_install_dir`      | No       | `C:\Program Files\IBM\WinCollect` | Specifies the directory where the WinCollect agent will be installed. |
+| `wincollect_agent_7_installer_file`   | Yes      | `files/wincollect-7.3.0-24.x64.exe` | Path to the WinCollect installer file. Make sure to keep the name of installer file since version is detected based on the name. |
+| `wincollect_agent_7_install_parameters` | No     | See `defaults/main.yml` | Provides parameters for the WinCollect installation, configuring silent installation, status server, log source auto-creation, and other settings. |
+| `wincollect_agent_7_version`          | No       | Auto-detected from `wincollect_agent_7_installer_file` | The version of the WinCollect agent, determined from the installer file name. |
+| `wincollect_syslog_status_server`     | No       | `{{ wincollect_target_address }}` | The address of the syslog status server, defaulting to the QRadar system address. |
+| `wincollect_target_address`           | Yes      |  | The IP address or FQDN of the IBM QRadar system to receive events. |
+| `wincollect_target_port`              | No       | `514` | The port on which the IBM QRadar system listens for incoming events. |
+| `wincollect_target_protocol`          | No       | `udp` | The protocol used for sending events to IBM QRadar (`udp` or `tcp`). |
+
+### Performance Tuning
+
+Performance tuning variables allow you to optimize the operation of the WinCollect agent.
+
+| Variable                                   | Required | Default           | Description |
+|--------------------------------------------|----------|-------------------|-------------|
+| `wincollect_agent_7_min_logs_to_process`   | No       | `500`             | Minimum threshold for the number of logs to process per cycle. |
+| `wincollect_agent_7_max_logs_to_process`   | No       | `750`             | Maximum number of logs the agent will process in a given cycle. |
+| `wincollect_agent_7_profile`               | No       | `Typical Server`  | Predefined performance profile for the agent. Adjust this setting based on the operational role of the server for optimal performance. |
+| `wincollect_agent_7_tuning_profile`        | No       | `Default (Endpoint)` | Specifies the tuning profile for optimal performance based on the deployment environment. |
+
+### Log Management
+
+| Variable                                   | Required | Default | Description |
+|--------------------------------------------|----------|---------|-------------|
+| `wincollect_agent_7_log_application`       | No       | `true`  | Enables logging for the Application event log. |
+| `wincollect_agent_7_log_directory_service` | No       | `false` | Enables logging for the Directory Service event log. |
+| `wincollect_agent_7_log_dns_server`        | No       | `false` | Enables logging for the DNS Server event log. |
+| `wincollect_agent_7_log_file_replication_service` | No | `false` | Enables logging for the File Replication Service event log. |
+| `wincollect_agent_7_log_forwardedevents`   | No       | `false` | Enables logging for the Forwarded Events log. |
+| `wincollect_agent_7_log_security`          | No       | `true`  | Enables logging for the Security event log. |
+| `wincollect_agent_7_log_system`            | No       | `true`  | Enables logging for the System event log. |
+
+### Event Filtering and Custom Queries
+
+#### Filter Settings
+
+Each event log source can be configured with specific filter settings using the following structure:
+
+| Variable                                  | Required | Default | Description |
+|-------------------------------------------|----------|---------|-------------|
+| `wincollect_agent_7_filter_application` | No | | See description below. |
+| `wincollect_agent_7_filter_directoryservice` | No | | See description below. |
+| `wincollect_agent_7_filter_dns` | No | | See description below. |
+| `wincollect_agent_7_filter_filereplicationservice` | No | | See description below. |
+| `wincollect_agent_7_filter_forwardedevents` | No | | See description below. |
+| `wincollect_agent_7_filter_security` | No | | See description below. |
+| `wincollect_agent_7_filter_system` | No | | See description below. |
+
+For each source, you must define two key variables: `type` and `events`.
+
+- `type`: Determines the filter type and must be one of the following:
+  - `nsalist`: Monitors a set of events recommended by the NSA.
+  - `whitelist`: Only forwards events that are explicitly listed.
+  - `blacklist`: Prevents the forwarding of listed events to IBM QRadar.
+  - `nofilter`: No filtering is applied, and all events from the source are forwarded.
+- `events`: A list of event IDs to be included or excluded, based on the `type` specified.
+
+#### Example Filter Configuration
+
+```yaml
+wincollect_agent_7_filter_application:
+  type: nsalist
+  events:
+    - 4624
+    - 4625
+```
+
+#### Custom Queries
+
+Custom queries provide a powerful mechanism for advanced event filtering based on specific criteria using XPath. This allows for precise control over which events are monitored and forwarded by the WinCollect agent.
+
+| Variable                             | Required | Default | Description |
+|--------------------------------------|----------|---------|-------------|
+| `wincollect_agent_7_custom_queries`  | No       | -       | Defines a list of custom XPath queries for event filtering. Each query should specify both a `path` and a `query` to accurately target events. Limiting the number of queries is recommended to avoid potential performance issues. |
+
+##### Query Structure
+
+- `path`: Specifies the log path where the query should be applied, e.g., `Microsoft-Windows-Windows Firewall With Advanced Security/Firewall`.
+- `query`: The XPath expression used to filter events within the specified path, e.g., `*[System[(Level=4 or Level=0) and (EventID=2004 or EventID=2005 or EventID=2006 or EventID=2009 or EventID=2033)]]`.
+
+##### Example Custom Query Configuration
+
+```yaml
+wincollect_agent_7_custom_queries:
+  - path: "Microsoft-Windows-Windows Firewall With Advanced Security/Firewall"
+    query: "*[System[(Level=4 or Level=0) and (EventID=2004 or EventID=2005 or EventID=2006 or EventID=2009 or EventID=2033)]]"
+```
 
 Dependencies
 ------------
@@ -67,45 +129,45 @@ Example Playbook
     - hosts: servers
 
       vars:
-        wincollect_agent_installer_file: 'files/wincollect-7.3.0-24.x64.exe'
+        wincollect_agent_7_installer_file: 'files/wincollect-7.3.0-24.x64.exe'
         wincollect_target_address: 192.168.0.1
         wincollect_target_protocol: udp
         wincollect_target_port: 514
-        wincollect_agent_log_security: true
-        wincollect_agent_log_application: true
-        wincollect_agent_log_system: true
-        wincollect_agent_log_directory_service: false
-        wincollect_agent_log_file_replication_service: false
-        wincollect_agent_log_forwardedevents: false
-        wincollect_agent_log_dns_server: false
-        wincollect_agent_filter_security:
+        wincollect_agent_7_log_security: true
+        wincollect_agent_7_log_application: true
+        wincollect_agent_7_log_system: true
+        wincollect_agent_7_log_directory_service: false
+        wincollect_agent_7_log_file_replication_service: false
+        wincollect_agent_7_log_forwardedevents: false
+        wincollect_agent_7_log_dns_server: false
+        wincollect_agent_7_filter_security:
           type: nsalist
           events: [4964,4947,4950,4954,4964,5031,5155]
-        wincollect_agent_filter_system:
+        wincollect_agent_7_filter_system:
           type: nsalist
           events: [104,1127,5025]
-        wincollect_agent_filter_application:
+        wincollect_agent_7_filter_application:
           type: nsalist
           events: [2,104]
-        wincollect_agent_filter_dns:
+        wincollect_agent_7_filter_dns:
           type: nofilter
           events: []
-        wincollect_agent_filter_filereplicationservice:
+        wincollect_agent_7_filter_filereplicationservice:
           type: nofilter
           events: []
-        wincollect_agent_filter_directoryservice:
+        wincollect_agent_7_filter_directoryservice:
           type: nofilter
           events: []
-        wincollect_agent_filter_forwardedevents:
+        wincollect_agent_7_filter_forwardedevents:
           type: nofilter
           events: []
-        wincollect_agent_custom_querys:
+        wincollect_agent_7_custom_queries:
           - path: "Microsoft-Windows-Windows Firewall With Advanced Security/Firewall"
             query: "*[System[(Level=4 or Level=0) and ( (EventID=2004 or EventID=2005 or EventID=2006 or EventID=2009 or EventID=2033) )]]"
 
 
       roles:
-        - ansible_role_wincollect_agent_7
+        - wincollect_agent_7
 
 License
 -------
@@ -116,6 +178,3 @@ Author Information
 ------------------
 
 Mattias Jonsson
-
-
-

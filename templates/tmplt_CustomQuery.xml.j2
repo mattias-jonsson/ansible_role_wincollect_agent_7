@@ -1,5 +1,5 @@
 <QueryList>
-{% for query in wincollect_agent_custom_querys %}
+{% for query in wincollect_agent_7_custom_queries %}
 <Query Id="{{ loop.index0 }}" Path="{{ query.path }}">
 <Select Path="{{ query.path }}">{{ query.query }}</Select>
 {% if query.suppress_query is defined %}

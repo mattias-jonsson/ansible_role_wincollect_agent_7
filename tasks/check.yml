@@ -1,0 +1,48 @@
+---
+
+- name: Get current QRadar WinCollect agent install location.
+  ansible.windows.win_reg_stat:
+    path: HKLM:\SYSTEM\ControlSet001\Services\WinCollect
+    name: ImagePath
+  register: wincollect_agent_7_installed_path_reg
+
+- name: Check if QRadar WinCollect binary exists.
+  ansible.windows.win_stat:
+    path: "{{ wincollect_agent_7_installed_path_reg.value | regex_replace('\\\"', '') }}"
+  register: wincollect_agent_7_installed_binary
+  when: wincollect_agent_7_installed_path_reg.exists
+
+- name: Set fact for agent install path
+  ansible.builtin.set_fact:
+    wincollect_agent_7_install_path: "{{ wincollect_agent_7_installed_binary.stat.path | regex_search('(.+)\\\\bin\\\\WinCollectSvc.exe', '\\1' ) | join('\n')  if wincollect_agent_7_installed_binary.stat.path is defined }}"
+
+- name: Get contents of install_config.txt
+  ansible.builtin.slurp:
+    src: '{{ wincollect_agent_7_install_path }}\config\install_config.txt'
+  register: wincollect_install_config
+  when: wincollect_agent_7_installed_path_reg.exists
+
+- name: Set fact for agent managed/unmanaged
+  ansible.builtin.set_fact:
+    wincollect_managed: "{{ wincollect_install_config['content'] | b64decode | regex_search('ConfigurationServer=(.+)', '\\1') | first | trim | length > 0 if wincollect_agent_7_installed_binary.stat.path is defined else 'false' }}"
+
+- name: Check uninstallstring
+  ansible.windows.win_reg_stat:
+    path: HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{{ wincollect_product_id }}
+    name: UninstallString
+  register: wincollect_uninstallstring
+
+- name: Add Uninstallstring to registry if missing.
+  become: true
+  ansible.windows.win_regedit:
+    path: HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{{ wincollect_product_id }}
+    name: UninstallString
+    data: "MsiExec.exe /X{{'{'}}wincollect_product_id{{'}'}}"
+    type: expandstring
+  when: not wincollect_uninstallstring.exists
+
+- name: Get installed QRadar WinCollect agent version
+  community.windows.win_file_version:
+    path: "{{ wincollect_agent_7_installed_path_reg.value | regex_replace('\\\"', '') }}"
+  register: wincollect_agent_7_installed_version
+  when: wincollect_agent_7_installed_path_reg.exists and wincollect_agent_7_installed_binary.stat.exists

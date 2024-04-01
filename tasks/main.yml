@@ -1,8 +1,22 @@
 ---
 
+- name: Assert that role is executed on a supported Operating System
+  ansible.builtin.assert:
+    that: >
+      ansible_distribution is search("Microsoft Windows Server 2016") or
+      ansible_distribution is search("Microsoft Windows Server 2019") or
+      ansible_distribution is search("Microsoft Windows Server 2022") or
+      ansible_distribution is search("Microsoft Windows 10") or
+      ansible_distribution is search("Microsoft Windows 11")
+    msg: "{{ ansible_distribution }} is not a supported Operating System for this role."
+
+- name: Include check tasks.
+  ansible.builtin.include_tasks:
+    file: check.yml
 - name: Include install tasks.
   ansible.builtin.include_tasks:
     file: install.yml
+  when: not wincollect_agent_7_installed_binary.stat.exists or wincollect_managed or (wincollect_agent_7_installed_version.win_file_version.file_version | default('1.0') is version(wincollect_agent_7_version, '<'))
 - name: Include configure tasks
   ansible.builtin.include_tasks:
     file: configure.yml

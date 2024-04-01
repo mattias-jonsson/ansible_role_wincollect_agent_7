@@ -15,7 +15,6 @@
   ansible.windows.win_service:
     name: wincollect
     state: stopped
-  when: wincollect_managed
 
 - name: Uninstall WinCollect if installed as managed installation.
   become: true

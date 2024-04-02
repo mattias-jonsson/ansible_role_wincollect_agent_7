@@ -14,10 +14,12 @@
 - name: Include check tasks.
   ansible.builtin.include_tasks:
     file: check.yml
+
 - name: Include install tasks.
   ansible.builtin.include_tasks:
     file: install.yml
-  when: not wincollect_agent_7_installed_binary.stat.exists | default(false) or wincollect_managed | default(false) or (wincollect_agent_7_installed_version.win_file_version.file_version | default('1.0') is version(wincollect_agent_7_version, '<'))
+  when: not wincollect_agent_7_installed_binary.stat.exists | default(false) or wincollect_managed | default(false) or (wincollect_agent_7_installed_version.win_file_version.file_version | default('1.0') is version(wincollect_agent_7_version | regex_replace('-','.'), '<'))
+
 - name: Include configure tasks
   ansible.builtin.include_tasks:
     file: configure.yml

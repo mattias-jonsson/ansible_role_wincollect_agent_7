@@ -1,4 +1,4 @@
-	<Service classification="Static" type="Service" version="{{ wincollect_agent_7_version }}" module="AgentCore" name="AgentCore">
+	<Service classification="Static" type="Service" version="{{ wincollect_agent_7_version | regex_replace('-','.') }}" module="AgentCore" name="AgentCore">
 		<Environment>
 			<Parameter name="LogMonitor.Socket.Type" value="UDP"/>
 			<Parameter name="HeartbeatInterval" value="300000"/>

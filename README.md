@@ -29,15 +29,17 @@ These variables define the setup and operational parameters for the WinCollect a
 
 | Variable                              | Required | Default | Description |
 |---------------------------------------|----------|---------|-------------|
-| `wincollect_agent_7_hostname`         | No       | `{{ ansible_hostname }}` | Hostname used by the WinCollect agent, defaulting to the Ansible-managed host's hostname. |
+| `wincollect_agent_7_hostname`         | No       | `{{ ansible_hostname }}` | Hostname used by the IBM WinCollect 7 agent, defaulting to the Ansible-managed host's hostname. |
 | `wincollect_agent_7_install_dir`      | No       | `C:\Program Files\IBM\WinCollect` | Specifies the directory where the WinCollect agent will be installed. |
-| `wincollect_agent_7_installer_file`   | Yes      | `files/wincollect-7.3.0-24.x64.exe` | Path to the WinCollect installer file. Make sure to keep the name of installer file since version is detected based on the name. |
-| `wincollect_agent_7_install_parameters` | No     | See `defaults/main.yml` | Provides parameters for the WinCollect installation, configuring silent installation, status server, log source auto-creation, and other settings. |
-| `wincollect_agent_7_version`          | No       | Auto-detected from `wincollect_agent_7_installer_file` | The version of the WinCollect agent, determined from the installer file name. |
-| `wincollect_agent_7_syslog_status_server`     | No       | `{{ wincollect_agent_7_target_address }}` | The address of the syslog status server, defaulting to the QRadar system address. |
+| `wincollect_agent_7_installer_file`   | Yes      |  | URL or local path to the WinCollect installer file. Make sure to keep the name of installer file since version is detected based on the name. |
+| `wincollect_agent_7_arch`             | No      | Auto-detected from `wincollect_agent_7_installer_file` | IBM WinCollect 7 agent architecture, valid options are x86 or x64. |
+| `wincollect_agent_7_install_parameters` | No     | See `defaults/main.yml` | Provides parameters for the IBM WinCollect 7 agent installation, configuring silent installation, status server, log source auto-creation, and other settings. |
+| `wincollect_agent_7_version`          | No       | Auto-detected from `wincollect_agent_7_installer_file` | The version of the IBM WinCollect 7 agent, determined from the installer file name. |
+| `wincollect_agent_7_syslog_status_server`     | No       | `{{ wincollect_agent_7_target_address }}` | The address of the syslog status server, defaulting to the IBM QRadar system address. |
 | `wincollect_agent_7_target_address`           | Yes      |  | The IP address or FQDN of the IBM QRadar system to receive events. |
 | `wincollect_agent_7_target_port`              | No       | `514` | The port on which the IBM QRadar system listens for incoming events. |
 | `wincollect_agent_7_target_protocol`          | No       | `udp` | The protocol used for sending events to IBM QRadar (`udp` or `tcp`). |
+| `wincollect_agent_7_sha256sum`          | No       | SHA256 checksums are provided within `defaults/main.yml`. | Map of IBM WinCollect 7 agent installer versions to their SHA256 checksums for integrity verification. |
 
 ### Performance Tuning
 
@@ -85,7 +87,7 @@ For each source, you must define two key variables: `type` and `events`.
   - `whitelist`: Only forwards events that are explicitly listed.
   - `blacklist`: Prevents the forwarding of listed events to IBM QRadar.
   - `nofilter`: No filtering is applied, and all events from the source are forwarded.
-- `events`: A list of event IDs to be included or excluded, based on the `type` specified.
+- `events`: A list of additional event IDs to be included or excluded, based on the `type` specified.
 
 #### Example Filter Configuration
 
@@ -129,7 +131,7 @@ Example Playbook
     - hosts: servers
 
       vars:
-        wincollect_agent_7_installer_file: 'files/wincollect-7.3.0-24.x64.exe'
+        wincollect_agent_7_installer_file: 'http://192.168.1.1:8080/pub/wincollect-7.3.0-24.x64.exe'
         wincollect_agent_7_target_address: 192.168.0.1
         wincollect_agent_7_target_protocol: udp
         wincollect_agent_7_target_port: 514

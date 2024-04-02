@@ -5,10 +5,36 @@
     state: file
   register: temp_file_name
 
-- name: Upload QRadar WinCollect agent installer.
-  ansible.windows.win_copy:
-    src: "{{ wincollect_agent_7_installer_file }}"
+
+- name: Block for file installers
+  block:
+    - name: Use sha256 to calculate the checksum
+      ansible.builtin.stat:
+        path: "{{ wincollect_agent_7_installer_file }}"
+        checksum_algorithm: sha256
+      delegate_to: localhost
+      register: filecopysha256sum
+
+    - name: Assert that installer file checksum is correct
+      ansible.builtin.assert:
+        that: filecopysha256sum.stat.checksum == (wincollect_agent_7_sha256sum[wincollect_agent_7_version ~ '.' ~ wincollect_agent_7_arch])
+        quiet: true
+        msg: "Installer file checksum validation failed."
+
+    - name: Upload IBM WinCollect agent installer.
+      ansible.windows.win_copy:
+        src: "{{ wincollect_agent_7_installer_file }}"
+        dest: "{{ temp_file_name.path }}"
+  when: not wincollect_agent_7_installer_file is ansible.builtin.url
+
+
+- name: Downloading IBM WinCollect agent installer.
+  ansible.windows.win_get_url:
+    url: "{{ wincollect_agent_7_installer_file }}"
     dest: "{{ temp_file_name.path }}"
+    checksum: "{{ wincollect_agent_7_sha256sum[wincollect_agent_7_version ~ '.' ~ wincollect_agent_7_arch] }}"
+    checksum_algorithm: "sha256"
+  when: wincollect_agent_7_installer_file is ansible.builtin.url
 
 - name: Check state of IBM WinCollect service.
   become: true
@@ -24,6 +50,10 @@
   ansible.windows.win_service:
     name: wincollect
     state: stopped
+  register: wincollect_service_stop
+  until: wincollect_service_stop.state | lower == 'stopped'
+  retries: 6
+  delay: 10
   when: wincollect_service_status.state | default('') | lower == 'running'
 
 - name: Uninstall IBM WinCollect if installed as managed installation.

@@ -3,11 +3,12 @@
 ### General Configuration
 wincollect_agent_7_hostname: '{{ ansible_hostname }}'
 wincollect_agent_7_install_dir: C:\Program Files\IBM\WinCollect
-# wincollect_agent_7_installer_file: 'files/wincollect-7.3.0-24.x64.exe'
+# wincollect_agent_7_installer_file: 'files/wincollect-7.3.0-24.x64.exe' # A default value is not provided.
+wincollect_agent_7_arch: "{{ wincollect_agent_7_installer_file.split('.')[-2] }}"
 wincollect_agent_7_install_parameters: '/s /v"/qn INSTALLDIR=\"{{ wincollect_agent_7_install_dir }}\" STATUSSERVER={{ wincollect_agent_7_target_address }} LOG_SOURCE_AUTO_CREATION_ENABLED=True LOG_SOURCE_AUTO_CREATION_PARAMETERS=""Component1.AgentDevice=DeviceWindowsLog&Component1.Action=create&Component1.LogSourceName={{ wincollect_agent_7_hostname }}&Component1.LogSourceIdentifier={{ wincollect_agent_7_hostname }}&Component1.Dest.Name={{ wincollect_agent_7_target_address }}&Component1.Dest.Hostname={{ wincollect_agent_7_target_address }}&Component1.Dest.Port={{ wincollect_agent_7_target_port }}&Component1.Dest.Protocol={{ wincollect_agent_7_target_protocol | upper }}&Component1.Log.Security=true&Component1.Log.System=true&Component1.Log.Application=true&Component1.Log.DNS+Server=true&Component1.Log.File+Replication+Service=true&Component1.Log.Directory+Service=true&Component1.RemoteMachinePollInterval=3000&Component1.EventRateTuningProfile=Typical+Server&Component1.MinLogsToProcessPerPass=100&Component1.MaxLogsToProcessPerPass=150"""'
-wincollect_agent_7_version: "{{ wincollect_agent_7_installer_file | regex_search('([0-9]\\.)+[0-9]-[0-9]+') | regex_replace('-','.') }}"
+wincollect_agent_7_version: "{{ wincollect_agent_7_installer_file.split('/')[-1] | regex_search('([0-9]\\.)+[0-9]-[0-9]+') }}"
 wincollect_agent_7_syslog_status_server: "{{ wincollect_agent_7_target_address }}"
-#wincollect_agent_7_target_address: 1.2.3.256 # A default value for the IP address or FQDN of the IBM QRadar system to receive events is not provided.
+#wincollect_agent_7_target_address: # A default value is not provided.
 wincollect_agent_7_target_port: 514
 wincollect_agent_7_target_protocol: udp
 
@@ -49,3 +50,11 @@ wincollect_agent_7_filter_forwardedevents:
   type: nofilter
   events: []
 wincollect_agent_7_custom_queries: [] # keep this below 10 querys to avoid performance issues
+
+wincollect_agent_7_sha256sum: # Make sure to verify these checksums and update as needed before using this role.
+  7.2.9-96.x64: 5b230bd61ae957346c1d2f095f5831b8b181cbb32e4190b7df7c79e6781ca1df
+  7.3.0-24.x64: 177e096ad04586d457e2f57fc904a64f05ea2c28ee1d079200f5e245570ea511
+  7.3.0-41.x64: 0f80fa587fcdaf35dc2775c3dff79dc7a8acaf37c558988fc9c82da9572864c8
+  7.3.1-22.x64: 16381d475436b75151c4e0c0c9f8eeb82097fd8329caa9ac854316a7771d7ed1
+  7.3.1-28.x64: 0ed5abc876d4383c5874d48518fb5e46aac42f9cf3499693f37d270f3fca19e4
+  7.3.1-43.x64: a64978dc31bfdd8f69e2734ae75aca732366c706e7adc3c5d8640e8c959a6656

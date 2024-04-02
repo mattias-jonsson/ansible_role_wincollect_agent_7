@@ -1,4 +1,4 @@
-<Service version="{{ wincollect_agent_7_version }}" classification="Service" type="DeviceType" module="DeviceWindowsLog" name="DeviceWindowsLog">
+<Service version="{{ wincollect_agent_7_version | regex_replace('-','.') }}" classification="Service" type="DeviceType" module="DeviceWindowsLog" name="DeviceWindowsLog">
 	<Environment>
 		<Parameter name="DeviceThreadPoolType" value="AdaptiveThreadPool"/>
 		<Parameter name="TimestampFormat" value="Seconds"/>

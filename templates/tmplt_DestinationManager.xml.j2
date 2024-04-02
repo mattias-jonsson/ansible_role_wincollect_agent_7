@@ -1,4 +1,4 @@
-<Service version="{{ wincollect_agent_7_version }}" classification="Service" type="Service" module="WinCollectPlugin" name="DestinationManager">
+<Service version="{{ wincollect_agent_7_version | regex_replace('-','.') }}" classification="Service" type="Service" module="WinCollectPlugin" name="DestinationManager">
 	<Environment/>
 	<InstanceData>
 		<Instance name="{{ wincollect_destinationmanager_instance_name }}">

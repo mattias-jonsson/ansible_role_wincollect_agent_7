@@ -32,15 +32,6 @@
     name: UninstallString
   register: wincollect_uninstallstring
 
-- name: Add Uninstallstring to registry if missing.
-  become: true
-  ansible.windows.win_regedit:
-    path: HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{{ wincollect_product_id }}
-    name: UninstallString
-    data: "MsiExec.exe /X{{'{'}}wincollect_product_id{{'}'}}"
-    type: expandstring
-  when: not wincollect_uninstallstring.exists
-
 - name: Get installed IBM WinCollect agent version
   community.windows.win_file_version:
     path: "{{ wincollect_agent_7_installed_path_reg.value | regex_replace('\\\"', '') }}"
@@ -55,3 +46,12 @@
     quiet: true
     msg: 'This role only supports IBM WinCollect 7'
   when: wincollect_agent_7_installed_path_reg.exists and wincollect_agent_7_installed_binary.stat.exists
+
+- name: Add Uninstallstring to registry if missing.
+  become: true
+  ansible.windows.win_regedit:
+    path: HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{{ wincollect_product_id }}
+    name: UninstallString
+    data: "MsiExec.exe /X{{'{'}}wincollect_product_id{{'}'}}"
+    type: expandstring
+  when: not wincollect_uninstallstring.exists

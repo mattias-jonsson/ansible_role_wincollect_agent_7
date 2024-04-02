@@ -6,29 +6,36 @@ argument_specs:
     options:
       wincollect_agent_7_hostname:
         description:
-          - "Hostname used by the WinCollect agent, defaulting to the Ansible-managed host's hostname."
+          - "Hostname used by the IBM WinCollect 7 agent, defaulting to the Ansible-managed host's hostname."
         required: false
         default: '{{ ansible_hostname }}'
         type: str
       wincollect_agent_7_install_dir:
         description:
-          - "Specifies the directory where the WinCollect agent will be installed."
+          - "Specifies the directory where the IBM WinCollect 7 agent will be installed."
         required: false
         default: 'C:\Program Files\IBM\WinCollect'
         type: str
       wincollect_agent_7_installer_file:
         description:
-          - "Path to the WinCollect installer file. Make sure to keep the name of installer file since version is detected based on the name."
+          - "Path to the IBM WinCollect 7 agent installer file. Make sure to keep the name of installer file since version is detected based on the name."
         required: true
         type: str
+      wincollect_agent_7_arch:
+        description:
+          - "IBM WinCollect 7 agent architecture, valid options are x86 or x64, determined from the installer file name."
+        required: false
+        default: "{{ wincollect_agent_7_installer_file.split('.')[-2] }}"
+        type: str
+        choices: [x86, x64]
       wincollect_agent_7_install_parameters:
         description:
-          - "Provides parameters for the WinCollect installation, configuring silent installation, status server, log source auto-creation, and other settings."
+          - "Provides parameters for the IBM WinCollect 7 agent installation, configuring silent installation, status server, log source auto-creation, and other settings."
         required: false
         default: "See defaults/main.yml"
       wincollect_agent_7_version:
         description:
-          - "The version of the WinCollect agent, determined from the installer file name."
+          - "The version of the IBM WinCollect 7 agent, determined from the installer file name."
         required: false
         default: "{{ wincollect_agent_7_installer_file | regex_search('([0-9]\\.)+[0-9]-[0-9]+') | regex_replace('-','.') }}"
         type: str
@@ -209,3 +216,15 @@ argument_specs:
           query:
             type: str
             required: true
+      wincollect_agent_7_sha256sum:
+        description:
+          - Map of IBM WinCollect 7 agent installer versions to their SHA256 checksums for integrity verification.
+        required: false
+        type: dict
+        default:
+          7.2.9-96.x64: 5b230bd61ae957346c1d2f095f5831b8b181cbb32e4190b7df7c79e6781ca1df
+          7.3.0-24.x64: 177e096ad04586d457e2f57fc904a64f05ea2c28ee1d079200f5e245570ea511
+          7.3.0-41.x64: 0f80fa587fcdaf35dc2775c3dff79dc7a8acaf37c558988fc9c82da9572864c8
+          7.3.1-22.x64: 16381d475436b75151c4e0c0c9f8eeb82097fd8329caa9ac854316a7771d7ed1
+          7.3.1-28.x64: 0ed5abc876d4383c5874d48518fb5e46aac42f9cf3499693f37d270f3fca19e4
+          7.3.1-43.x64: a64978dc31bfdd8f69e2734ae75aca732366c706e7adc3c5d8640e8c959a6656
